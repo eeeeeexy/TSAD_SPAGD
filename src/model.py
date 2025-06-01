@@ -1,10 +1,3 @@
-# -*- encoding: utf-8 -*-
-'''
-@File    :   model.py
-@Time    :   2023/12/03 10:27:41
-@Author  :   Fei Gao
-Beijing, China
-'''
 from typing import Optional
 
 import torch
@@ -59,18 +52,11 @@ class EmbeddingGAT(MessagePassing):
                 edge_index: Tensor,
                 embedding: Tensor,
                 return_attention_weights: bool = False) -> Tensor:
-        """_summary_
 
-        Args:
-            x (Tensor): node features with sie [number_nodes * batch_size, in_channels]
-            edge_index (Tensor): edge index with size [2, edge_num*batch_size]
-            embedding (Tensor): embedding matrix with size [number_nodes * batch_size, out_channels]
-            return_attention_weights (_type_, optional): _description_. Defaults to None.
-        """
         H, C = self.heads, self.out_channels
         assert x.dim() == 2, "Static graphs not supported in 'GATConv'"
-        x =  self.lin(x).view(-1, H, C) # [number_nodes * batch_size, heads, out_channels])
-        embedding = embedding.unsqueeze(1).repeat(1, H, 1) # [number_nodes * batch_size, heads, out_channels]
+        x =  self.lin(x).view(-1, H, C)
+        embedding = embedding.unsqueeze(1).repeat(1, H, 1)
         xAndemb_src = xAndemb_dst = torch.concat((x, embedding), dim=-1)
 
         # Next, we compute node-level attention coefficients, both for source
@@ -104,8 +90,7 @@ class EmbeddingGAT(MessagePassing):
                           index: Tensor, 
                           ptr: OptTensor,
                           size_i: Optional[int]) -> Tensor:
-        # Given edge-level attention coefficients for source and target nodes,
-        # we simply need to sum them up to "emulate" concatenation:
+
         alpha = alpha_j + alpha_i
         alpha = F.leaky_relu(alpha, self.negative_slope)
         alpha = softmax(alpha, index, ptr, size_i)
@@ -163,24 +148,10 @@ class GDN(nn.Module):
             edge_index[:, s:e] += i * number_nodes
         return edge_index
         
-        
-        
     def forward(self, batch_x: Tensor) -> Tensor:
-        """GDN forward
-
-        Args:
-            batch_x (Tensor): node features with size [batch_size, number_nodes, number_node_features]
-
-        Returns:
-            Tensor: node prediction with size [batch_size, number_nodes]
-        """
-
-        # import pdb; pdb.set_trace()
-        
+ 
         B, N, C = batch_x.shape
-        
-        # get node features for GNN
-        # --> size [number_nodes * batch_size, number_node_features]
+
         x = batch_x.reshape(-1, C)
         
         # get batched KNN edge_index for GNN

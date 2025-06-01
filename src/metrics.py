@@ -36,9 +36,3 @@ def compute_pre_recall_f1(target, score):
 def compute_roc_auc_score(target, score):
     roc_auc = roc_auc_score(target, score)
     return roc_auc
-
-import torch
-
-
-
-# auc; aucpr; f1; recall; precision

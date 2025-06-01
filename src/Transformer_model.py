@@ -11,30 +11,14 @@ from math import sqrt
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class TriangularCausalMask():
-    """
-    This class creates a 2D causal mask for sequences to ensure causality 
-    in transformers. The mask ensures that a position in the sequence 
-    cannot attend to future positions, thereby ensuring the order of 
-    the sequence is respected.
-    """
-    
+
     def __init__(self, L, device="cpu"):
-        """
-        Initialize the TriangularCausalMask.
-        
-        Args:
-        L (int): Length of each sequence.
-        device (str, optional): The computing device where the mask will reside. 
-                                Defaults to "cpu".
-        """
-        
+ 
         # Define the shape of the mask tensor
         mask_shape = [L, L]
         
         with torch.no_grad():
-            # Create an upper triangular matrix of shape [L, L]
-            # with the diagonal and above set to True (indicating masked positions)
-            # and the rest set to False.
+
             self._mask = torch.triu(torch.ones(mask_shape, dtype=torch.bool), diagonal=1).to(device)
             
     @property
@@ -119,7 +103,6 @@ class DataEmbedding(nn.Module):
         return self.dropout(x)
 
 
-
 class EncoderLayer(nn.Module):
     def __init__(self, d_model, n_heads, d_ff=None, dropout=0.1, activation="relu"):
         super(EncoderLayer, self).__init__()
@@ -136,8 +119,6 @@ class EncoderLayer(nn.Module):
         
         # Generate the mask for the current batch size and sequence length
         attn_mask = TriangularCausalMask(L=x.size(1), device=x.device).mask
-        # attn_mask = TriangularCausalMask(L=x.size(1), device=x.device)
-
 
         attn_output, _ = self.attention(x, x, x, attn_mask=None)
         x = x + self.dropout(attn_output)
