@@ -15,7 +15,7 @@ class TimeDataset(Dataset):
                  slide_stride:int=5,
                  window_size=50,
                  step=50,
-                 path_prefix:str='/home/jinyu/XieYuan/TS-AnomalyDetection/TSAD_SPAGD/dataset/processed_data/'):
+                 path_prefix:str='dataset/processed_data/'):
         super(TimeDataset, self).__init__()
         self.dataset_name = dataset_name
         self.mode = mode
