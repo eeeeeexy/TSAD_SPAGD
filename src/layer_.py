@@ -103,12 +103,10 @@ class mixprop_gat_init(nn.Module):
         self.gdep = gdep
         self.alpha = alpha
 
-        # 多层 GATConv
         self.gat_layers = nn.ModuleList([
             GATConv(c_in, c_in, heads=heads, dropout=dropout, concat=False) for _ in range(gdep)
         ])
 
-        # 最后的 MLP 输出
         self.mlp = nn.Linear((gdep + 1) * c_in, c_out)
 
     def forward(self, x, edge_index):
@@ -220,10 +218,6 @@ class GATLayer(nn.Module):
         # Concatenate them along the last dimension
         a_input = torch.cat([Wh_repeat_1, Wh_repeat_2], dim=4)  
 
-        # import pdb; pdb.set_trace()
-
-        # a_input = torch.cat([Wh.repeat(1, N).view(N * N, -1), Wh.repeat(N, 1)], dim=1)
-        # a_input = torch.cat([Wh.unsqueeze(1).repeat(1, N, 1), Wh.unsqueeze(0).repeat(N, 1, 1)], dim=2)
         a_input_transformed = self.linear(a_input.view(-1, 65536))  # Flatten and apply linear transformation
         a_input_transformed = a_input_transformed.view(16, 16, 32)
         # a_input = a_input.view(N, N, -1)
@@ -247,7 +241,7 @@ class mixatt(nn.Module):
         self.alpha = alpha
         self.dropout = nn.Dropout(dropout)
         self.gat_layers = nn.ModuleList([GATLayer(c_in, c_in, dropout, alpha) for _ in range(gdep)])
-        self.mlp = linear((gdep + 1) * c_in, c_out)  # 拼接后输出
+        self.mlp = linear((gdep + 1) * c_in, c_out)
 
     def forward(self, x, adj):
         h = x

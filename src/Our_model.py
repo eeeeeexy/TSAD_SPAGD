@@ -79,7 +79,7 @@ class graph_constructor(nn.Module):
         gap_list_detach = gap_list.detach()
         gap_list_ = torch.sigmoid(gap_list_detach)
         # compute k%
-        k = 30  # 前5%
+        k = 30
         num = math.ceil(len(gap_list_) * (k / 100))
         topk_, topk_idx = torch.topk(gap_list_, num, largest=False)
         topk_ = topk_.flip(0)
